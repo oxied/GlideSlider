@@ -1,11 +1,17 @@
 package com.glide.slider.library.SliderTypes;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.bumptech.glide.DrawableRequestBuilder;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.GlideBitmapDrawable;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.glide.slider.library.R;
 
 import java.io.File;
@@ -45,13 +51,15 @@ public abstract class BaseSliderView {
 
     private String mDescription;
 
-    /**
-     * Scale type of the image.
-     */
-    private boolean mCrop = true;
+    private ScaleType mScaleType = null;
+    private BackgroundToEdgeColor edgeColor = null;
 
     public enum ScaleType {
-        CenterCrop, CenterInside, Fit, FitCenterCrop
+        CENTER_CROP, FIT_CENTER, FIT_XY
+    }
+
+    public enum BackgroundToEdgeColor {
+        LEFT_UPPER, LEFT_BOTTOM, RIGHT_UPPER, RIGHT_BOTTOM
     }
 
     protected BaseSliderView(Context context) {
@@ -193,7 +201,7 @@ public abstract class BaseSliderView {
      * @param v               the whole view
      * @param targetImageView where to place image
      */
-    protected void bindEventAndShow(final View v, ImageView targetImageView) {
+    protected void bindEventAndShow(final View v, final ImageView targetImageView) {
         final BaseSliderView me = this;
 
         v.setOnClickListener(new View.OnClickListener() {
@@ -214,79 +222,92 @@ public abstract class BaseSliderView {
 
         v.findViewById(R.id.loading_bar).setVisibility(View.INVISIBLE);
 
-        if (mCrop) {
-            if (mUrl != null) {
-                if (getEmpty() != 0 && getError() != 0) {
-                    Glide.with(mContext).load(mUrl).placeholder(getEmpty()).error(getError()).centerCrop().into(targetImageView);
-                } else if (getEmpty() != 0) {
-                    Glide.with(mContext).load(mUrl).placeholder(getEmpty()).centerCrop().into(targetImageView);
-                } else if (getError() != 0) {
-                    Glide.with(mContext).load(mUrl).error(getError()).centerCrop().into(targetImageView);
-                } else {
-                    Glide.with(mContext).load(mUrl).centerCrop().into(targetImageView);
-                }
-            } else if (mFile != null) {
-                if (getEmpty() != 0 && getError() != 0) {
-                    Glide.with(mContext).load(mFile).placeholder(getEmpty()).error(getError()).centerCrop().into(targetImageView);
-                } else if (getEmpty() != 0) {
-                    Glide.with(mContext).load(mFile).placeholder(getEmpty()).centerCrop().into(targetImageView);
-                } else if (getError() != 0) {
-                    Glide.with(mContext).load(mFile).error(getError()).centerCrop().into(targetImageView);
-                } else {
-                    Glide.with(mContext).load(mFile).centerCrop().into(targetImageView);
-                }
-            } else if (mRes != 0) {
-                if (getEmpty() != 0 && getError() != 0) {
-                    Glide.with(mContext).load(mRes).placeholder(getEmpty()).error(getError()).centerCrop().into(targetImageView);
-                } else if (getEmpty() != 0) {
-                    Glide.with(mContext).load(mRes).placeholder(getEmpty()).centerCrop().into(targetImageView);
-                } else if (getError() != 0) {
-                    Glide.with(mContext).load(mRes).error(getError()).centerCrop().into(targetImageView);
-                } else {
-                    Glide.with(mContext).load(mRes).centerCrop().into(targetImageView);
-                }
-            } else {
-                return;
-            }
+        DrawableRequestBuilder builder = null;
+        if (mUrl != null) {
+            builder = Glide.with(mContext).load(mUrl);
+        } else if (mFile != null) {
+            builder = Glide.with(mContext).load(mFile);
+        } else if (mRes != 0) {
+            builder = Glide.with(mContext).load(mRes);
         } else {
-            if (mUrl != null) {
-                if (getEmpty() != 0 && getError() != 0) {
-                    Glide.with(mContext).load(mUrl).placeholder(getEmpty()).error(getError()).into(targetImageView);
-                } else if (getEmpty() != 0) {
-                    Glide.with(mContext).load(mUrl).placeholder(getEmpty()).into(targetImageView);
-                } else if (getError() != 0) {
-                    Glide.with(mContext).load(mUrl).error(getError()).into(targetImageView);
-                } else {
-                    Glide.with(mContext).load(mUrl).into(targetImageView);
-                }
-            } else if (mFile != null) {
-                if (getEmpty() != 0 && getError() != 0) {
-                    Glide.with(mContext).load(mFile).placeholder(getEmpty()).error(getError()).into(targetImageView);
-                } else if (getEmpty() != 0) {
-                    Glide.with(mContext).load(mFile).placeholder(getEmpty()).into(targetImageView);
-                } else if (getError() != 0) {
-                    Glide.with(mContext).load(mFile).error(getError()).into(targetImageView);
-                } else {
-                    Glide.with(mContext).load(mFile).into(targetImageView);
-                }
-            } else if (mRes != 0) {
-                if (getEmpty() != 0 && getError() != 0) {
-                    Glide.with(mContext).load(mRes).placeholder(getEmpty()).error(getError()).into(targetImageView);
-                } else if (getEmpty() != 0) {
-                    Glide.with(mContext).load(mRes).placeholder(getEmpty()).into(targetImageView);
-                } else if (getError() != 0) {
-                    Glide.with(mContext).load(mRes).error(getError()).into(targetImageView);
-                } else {
-                    Glide.with(mContext).load(mRes).into(targetImageView);
-                }
-            } else {
-                return;
+            return;
+        }
+
+        if (getEmpty() != 0 && getError() != 0) {
+            builder = builder.placeholder(getEmpty()).error(getError());
+        } else if (getEmpty() != 0) {
+            builder = builder.placeholder(getEmpty());
+        } else if (getError() != 0) {
+            builder = builder.error(getError());
+        }
+
+        if (mScaleType != null) {
+            switch (mScaleType) {
+                case CENTER_CROP:
+                    builder = builder.centerCrop();
+                    break;
+                case FIT_CENTER:
+                    builder = builder.fitCenter();
+                    break;
+                case FIT_XY:
+                    targetImageView.setScaleType(ImageView.ScaleType.FIT_XY);
+                    break;
             }
         }
+
+        if (edgeColor != null) {
+            builder.listener(new RequestListener() {
+                @Override
+                public boolean onException(Exception e, Object model, Target target, boolean isFirstResource) {
+                    return false;
+                }
+
+                @Override
+                public boolean onResourceReady(Object resource, Object model, Target target, boolean isFromMemoryCache, boolean isFirstResource) {
+                    if (!(resource instanceof GlideBitmapDrawable)) {
+                        return false;
+                    }
+
+                    final Bitmap bitmap = ((GlideBitmapDrawable) resource).getBitmap();
+                    int pixel;
+                    switch (edgeColor) {
+                        case LEFT_UPPER:
+                            pixel = bitmap.getPixel(0, 0);
+                            break;
+                        case LEFT_BOTTOM:
+                            pixel = bitmap.getPixel(0, bitmap.getHeight() - 1);
+                            break;
+                        case RIGHT_UPPER:
+                            pixel = bitmap.getPixel(bitmap.getWidth() - 1, 0);
+                            break;
+                        case RIGHT_BOTTOM:
+                            pixel = bitmap.getPixel(bitmap.getWidth() - 1, bitmap.getHeight() - 1);
+                            break;
+                        default:
+                            throw new IllegalStateException("Fifth edge?");
+                    }
+
+                    int redValue = Color.red(pixel);
+                    int greenValue = Color.green(pixel);
+                    int blueValue = Color.blue(pixel);
+
+                    targetImageView.setBackgroundColor(pixel);
+
+                    return false;
+                }
+            });
+        }
+
+        builder.into(targetImageView);
     }
 
-    public BaseSliderView setCenterCrop(boolean crop) {
-        mCrop = crop;
+    public BaseSliderView setScaleType(ScaleType type) {
+        mScaleType = type;
+        return this;
+    }
+
+    public BaseSliderView setEdgeColorToBackground(BackgroundToEdgeColor edgeColor) {
+        this.edgeColor = edgeColor;
         return this;
     }
 
