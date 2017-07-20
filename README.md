@@ -22,20 +22,7 @@ allprojects {
 ```groovy
 dependencies {
     	compile 'com.github.bumptech.glide:glide:3.8.0'
-    	compile 'com.nineoldandroids:library:2.4.0'
-    	compile 'com.github.firdausmaulan:GlideSlider:1.0.0'
-}
-```
-
-- If you have problem with duplicate entry: com/nineoldandroids/animation/Animator$AnimatorListener.class
-- Just exclude nineoldandroids library
-
-```groovy
-dependencies {
-    	compile 'com.github.bumptech.glide:glide:3.8.0'
-    	compile ('com.github.firdausmaulan:GlideSlider:1.0.0') {
-		exclude group: 'com.nineoldandroids', module: 'library'
-	}
+    	compile 'com.github.oxied:GlideSlider:1.0.0'
 }
 ```
 
@@ -80,7 +67,6 @@ There are some default indicators. If you want to use a provided indicator:
 
 ## Thanks
 
-- [AndroidImageSlider](https://github.com/daimajia/AndroidImageSlider)
+- [GlideSlider](https://github.com/firdausmaulan/GlideSlider)
 - [Glide](https://github.com/bumptech/glide)
-- [NineOldAndroids](https://github.com/JakeWharton/NineOldAndroids)
 - [ViewPagerTransforms](https://github.com/ToxicBakery/ViewPagerTransforms)
