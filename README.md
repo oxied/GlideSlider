@@ -1,6 +1,12 @@
-- Edited from https://github.com/daimajia/AndroidImageSlider
-- Change image loader from Picasso to Glide
+[![Release](https://jitpack.io/v/oxied/GlideSlider.svg)](https://jitpack.io/#oxied/GlideSlider)
+
+- Edited from https://github.com/firdausmaulan/GlideSlider
+- Removed nineoldandroids and updated android libs/tools versions
+
+## Wiki
  
+https://github.com/daimajia/AndroidImageSlider/wiki
+
 ## Demo
  
 ![](http://ww3.sinaimg.cn/mw690/610dc034jw1egzor66ojdg20950fknpe.gif)
@@ -22,7 +28,7 @@ allprojects {
 ```groovy
 dependencies {
     	compile 'com.github.bumptech.glide:glide:3.8.0'
-    	compile 'com.github.oxied:GlideSlider:1.0.0'
+    	compile 'com.github.oxied:GlideSlider:1.0.3'
 }
 ```
 
@@ -67,6 +73,7 @@ There are some default indicators. If you want to use a provided indicator:
 
 ## Thanks
 
-- [GlideSlider](https://github.com/firdausmaulan/GlideSlider)
+- [AndroidImageSlider](https://github.com/daimajia/AndroidImageSlider)
+- [GlideSlider](https://github.com/firdausmaulan/GlideSlider) – AndroidImageSlider fork
 - [Glide](https://github.com/bumptech/glide)
 - [ViewPagerTransforms](https://github.com/ToxicBakery/ViewPagerTransforms)
