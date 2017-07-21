@@ -22,10 +22,12 @@ public class SliderAdapter extends PagerAdapter implements BaseSliderView.ImageL
         mImageContents = new ArrayList<BaseSliderView>();
     }
 
+    /**
+     * Call notifyDataSetChanged after adding slides.
+     */
     public <T extends BaseSliderView> void addSlider(T slider){
         slider.setOnImageLoadListener(this);
         mImageContents.add(slider);
-        notifyDataSetChanged();
     }
 
     public BaseSliderView getSliderView(int position){

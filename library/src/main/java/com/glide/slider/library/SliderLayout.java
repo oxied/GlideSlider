@@ -237,6 +237,10 @@ public class SliderLayout extends RelativeLayout{
         mSliderAdapter.addSlider(imageContent);
     }
 
+    public void notifyDataSetChanged() {
+        mSliderAdapter.notifyDataSetChanged();
+    }
+
     private android.os.Handler mh = new android.os.Handler(){
         @Override
         public void handleMessage(Message msg) {
@@ -606,9 +610,7 @@ public class SliderLayout extends RelativeLayout{
      * @return
      */
     public int getCurrentPosition(){
-
-        if(getRealAdapter() == null)
-            throw new IllegalStateException("You did not set a slider adapter");
+        assertAdapter();
 
         return mViewPager.getCurrentItem() % getRealAdapter().getCount();
 
@@ -619,9 +621,7 @@ public class SliderLayout extends RelativeLayout{
      * @return
      */
     public BaseSliderView getCurrentSlider(){
-
-        if(getRealAdapter() == null)
-            throw new IllegalStateException("You did not set a slider adapter");
+        assertAdapter();
 
         int count = getRealAdapter().getCount();
         int realCount = mViewPager.getCurrentItem() % count;
@@ -656,11 +656,11 @@ public class SliderLayout extends RelativeLayout{
      * @param position
      */
     public void setCurrentPosition(int position, boolean smooth) {
-        if (getRealAdapter() == null)
-            throw new IllegalStateException("You did not set a slider adapter");
+        assertAdapter();
         if(position >= getRealAdapter().getCount()){
             throw new IllegalStateException("Item position is not exist");
         }
+
         int p = mViewPager.getCurrentItem() % getRealAdapter().getCount();
         int n = (position - p) + mViewPager.getCurrentItem();
         mViewPager.setCurrentItem(n, smooth);
@@ -674,10 +674,7 @@ public class SliderLayout extends RelativeLayout{
      * move to prev slide.
      */
     public void movePrevPosition(boolean smooth) {
-
-        if (getRealAdapter() == null)
-            throw new IllegalStateException("You did not set a slider adapter");
-
+        assertAdapter();
         mViewPager.setCurrentItem(mViewPager.getCurrentItem() - 1, smooth);
     }
 
@@ -689,14 +686,20 @@ public class SliderLayout extends RelativeLayout{
      * move to next slide.
      */
     public void moveNextPosition(boolean smooth) {
-
-        if (getRealAdapter() == null)
-            throw new IllegalStateException("You did not set a slider adapter");
-
+        assertAdapter();
         mViewPager.setCurrentItem(mViewPager.getCurrentItem() + 1, smooth);
     }
 
     public void moveNextPosition() {
         moveNextPosition(true);
     }
+
+    private void assertAdapter() {
+        if (getRealAdapter() == null) {
+            throw new IllegalStateException("You did not set a slider adapter");
+        } else if (getRealAdapter().getCount() == 0) {
+            throw new IllegalStateException("Adapter count is zero");
+        }
+    }
+
 }
