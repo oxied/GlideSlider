@@ -108,6 +108,15 @@ public class SliderLayout extends RelativeLayout{
      */
     private Timer mCycleTimer;
     private TimerTask mCycleTask;
+    private android.os.Handler mh = new android.os.Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            if (getRealAdapter().getCount() != 0) {
+                moveNextPosition(true);
+            }
+        }
+    };
 
     /**
      * For resuming the cycle, after user touch or click the {@link com.glide.slider.library.Tricks.ViewPagerEx}.
@@ -241,13 +250,9 @@ public class SliderLayout extends RelativeLayout{
         mSliderAdapter.notifyDataSetChanged();
     }
 
-    private android.os.Handler mh = new android.os.Handler(){
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            moveNextPosition(true);
-        }
-    };
+    public void setOffscreenPageLimit(int limit) {
+        mViewPager.setOffscreenPageLimit(limit);
+    }
 
     public void startAutoCycle(){
         startAutoCycle(mSliderDuration, mSliderDuration, mAutoRecover);
@@ -349,8 +354,6 @@ public class SliderLayout extends RelativeLayout{
             mResumingTimer.schedule(mResumingTask, 6000);
         }
     }
-
-
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
@@ -675,7 +678,9 @@ public class SliderLayout extends RelativeLayout{
      */
     public void movePrevPosition(boolean smooth) {
         assertAdapter();
+        pauseAutoCycle();
         mViewPager.setCurrentItem(mViewPager.getCurrentItem() - 1, smooth);
+        recoverCycle();
     }
 
     public void movePrevPosition(){
@@ -687,7 +692,9 @@ public class SliderLayout extends RelativeLayout{
      */
     public void moveNextPosition(boolean smooth) {
         assertAdapter();
+        pauseAutoCycle();
         mViewPager.setCurrentItem(mViewPager.getCurrentItem() + 1, smooth);
+        recoverCycle();
     }
 
     public void moveNextPosition() {
